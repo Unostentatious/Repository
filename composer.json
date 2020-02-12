@@ -1,0 +1,41 @@
+{
+  "name": "unostentatious/repository",
+  "description": "Abstraction library implementing repository pattern for Eloquent models",
+  "type": "library",
+  "license": "MIT",
+  "keywords": [
+    "libraries",
+    "laravel",
+    "lumen"
+  ],
+  "require": {
+    "php": ">=7.4"
+  },
+  "require-dev": {
+    "laravel/lumen-framework": "^6.3",
+    "mockery/mockery": "^1.3",
+    "phpunit/phpunit": "^8.3"
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "preferred-install": "dist",
+    "sort-packages": true
+  },
+  "extra": {
+    "laravel": {
+      "dont-discover": []
+    }
+  },
+  "autoload": {
+    "psr-4": {
+      "Unostentatious\\Repository\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Unostentatious\\Repository\\Tests\\": "tests"
+    }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}

@@ -1,0 +1,22 @@
+version: '2'
+services:
+
+  # Backend Definition ------------------------------
+  unostent-nginx:
+    build:
+      context: ./
+      dockerfile: unostent.nginx.docker
+    volumes:
+      - ../:/var/www
+    environment:
+      - VIRTUAL_HOST=unostent.repo.local
+    links:
+      - unostent-php
+    depends_on:
+      - unostent-php
+  unostent-php:
+    build:
+      context: ./
+      dockerfile: unostent.php.docker
+    volumes:
+      - ../:/var/www

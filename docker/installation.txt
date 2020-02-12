@@ -1,0 +1,7 @@
+## Development Server
+
+### Install PHP 7.2 dependencies
+sudo yum install php72 php72-mbstring php72-xml php72-fpm php72-pdo php72-mysqlnd mysql57-server nginx git
+
+### Check if PHP has been installed properly
+sudo service php-fpm status; sudo service nginx status;
