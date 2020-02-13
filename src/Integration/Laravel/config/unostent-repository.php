@@ -18,7 +18,7 @@ return [
     | `app/{destination}/{placeholder}`
     |
     */
-    'root' => base_path(),
+    'root' => \base_path(),
 
     /*
     |--------------------------------------------------------------------------

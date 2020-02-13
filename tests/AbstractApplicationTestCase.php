@@ -8,6 +8,8 @@ use Laravel\Lumen\Application;
 abstract class AbstractApplicationTestCase extends AbstractTestCase
 {
     /**
+     * The application instance.
+     *
      * @var \Laravel\Lumen\Application
      */
     private Application $app;

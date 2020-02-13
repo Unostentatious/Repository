@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Unostentatious\Repository\Integration\Laravel;
 
 use Illuminate\Support\ServiceProvider;
-use Unostentatious\Repository\Integration\Laravel\Exceptions\DirectoryNotFoundException;
 use Unostentatious\Repository\Integration\Laravel\Exceptions\IncorrectClassStructureException;
 
 final class UnostentatiousRepositoryProvider extends ServiceProvider
@@ -45,45 +44,20 @@ final class UnostentatiousRepositoryProvider extends ServiceProvider
             \config('unostent-repository.placeholder', null)
         );
 
-        foreach ($this->getFiles($directories) as $file) {
-            $tokens = $this->getFileTokens($file);
+        if ($directories !== null) {
+            foreach ($this->getFiles($directories) as $file) {
+                $tokens = $this->getFileTokens($file);
 
-            [$interface, $repository] = $this->getRepoAndInterface($tokens);
+                [$interface, $repository] = $this->getRepoAndInterface($tokens);
 
-            // If it is already in the container, skip it.
-            if ($this->app->has($interface) === true) {
-                continue;
-            }
+                // If it is already in the container, skip it.
+                if ($this->app->has($interface) === true) {
+                    continue;
+                }
 
-            $this->app->bind($interface, $repository);
-        }
-    }
-
-    /**
-     * Return the file as php tokens.
-     *
-     * @param string $file
-     *
-     * @return mixed[]
-     *
-     * @throws \Unostentatious\Repository\Integration\Laravel\Exceptions\IncorrectClassStructureException
-     */
-    private function getFileTokens(string $file): array
-    {
-        $tokens = [];
-        $resource = \fopen($file, 'r');
-        $buffer = '';
-
-        while (\feof($resource) === false) {
-            $buffer .= \fread($resource, 512);
-            $tokens = \token_get_all($buffer);
-
-            if (\strpos($buffer, '{') === false) {
-                throw new IncorrectClassStructureException('Class is incorrectly structured.');
+                $this->app->bind($interface, $repository);
             }
         }
-
-        return $tokens;
     }
 
     /**
@@ -128,6 +102,76 @@ final class UnostentatiousRepositoryProvider extends ServiceProvider
     }
 
     /**
+     * Build the directories for the repository and interface destinations.
+     *
+     * @param string $root
+     * @param null|string $destination
+     * @param null|string $placeholder
+     *
+     * @return null|string
+     */
+    private function buildDirectoryPaths(
+        string $root,
+        ?string $destination = null,
+        ?string $placeholder = null
+    ): ?string {
+        $this->repositoryDir = $placeholder ?? $this->repositoryDir;
+
+        $repositoryDirectory = \sprintf('%s/%s', $root, $this->repositoryDir);
+
+        if ($destination !== null) {
+            $repositoryDirectory = \sprintf(
+                '%s/%s/%s',
+                $root,
+                $destination,
+                $this->repositoryDir
+            );
+        }
+        $interfaceDirectory = \sprintf('%s/%s', $repositoryDirectory, 'Interfaces');
+
+        try {
+            // If this prompt's and exception, it means the directory is not yet created,
+            // this suggests that the directory and config hasn't been established yet,
+            // so in that sense, instead of throwing an exception,
+            // just return null to notify the provider that there is no action needed to be done.
+
+            \opendir($repositoryDirectory);
+            \opendir($interfaceDirectory);
+        } catch (\ErrorException $error) {
+            return null;
+        }
+
+        return $repositoryDirectory;
+    }
+
+    /**
+     * Return the file as php tokens.
+     *
+     * @param string $file
+     *
+     * @return mixed[]
+     *
+     * @throws \Unostentatious\Repository\Integration\Laravel\Exceptions\IncorrectClassStructureException
+     */
+    private function getFileTokens(string $file): array
+    {
+        $tokens = [];
+        $resource = \fopen($file, 'r');
+        $buffer = '';
+
+        while (\feof($resource) === false) {
+            $buffer .= \fread($resource, 512);
+            $tokens = \token_get_all($buffer);
+
+            if (\strpos($buffer, '{') === false) {
+                throw new IncorrectClassStructureException('Class is incorrectly structured.');
+            }
+        }
+
+        return $tokens;
+    }
+
+    /**
      * Return the list of files within the given directory.
      *
      * @param string $directory
@@ -147,40 +191,5 @@ final class UnostentatiousRepositoryProvider extends ServiceProvider
         }
 
         return $result;
-    }
-
-    /**
-     * Build the directories for the repository and interface destinations.
-     *
-     * @param string $root
-     * @param null|string $destination
-     * @param null|string $placeholder
-     *
-     * @return mixed[]
-     */
-    private function buildDirectoryPaths(string $root, ?string $destination = null, ?string $placeholder = null): string
-    {
-        $this->repositoryDir = $placeholder ?? $this->repositoryDir;
-
-        $repositoryDirectory = \sprintf('%s/%s', $root, $this->repositoryDir);
-
-        if ($destination !== null) {
-            $repositoryDirectory = \sprintf(
-                '%s/%s/%s',
-                $root,
-                $destination,
-                $this->repositoryDir
-            );
-        }
-        $interfaceDirectory = \sprintf('%s/%s', $repositoryDirectory, 'Interfaces');
-
-        try {
-            opendir($repositoryDirectory);
-            opendir($interfaceDirectory);
-        } catch (\ErrorException $error) {
-            throw new DirectoryNotFoundException($error->getMessage(), $error->getCode());
-        }
-
-        return $repositoryDirectory;
     }
 }

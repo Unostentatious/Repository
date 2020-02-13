@@ -6,8 +6,6 @@ namespace Unostentatious\Repository\Tests;
 use Mockery;
 use Mockery\LegacyMockInterface;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
-use ReflectionMethod;
 
 abstract class AbstractTestCase extends TestCase
 {
@@ -21,9 +19,9 @@ abstract class AbstractTestCase extends TestCase
      *
      * @throws \ReflectionException
      */
-    protected function getMethodAsPublic(string $className, string $methodName): ReflectionMethod
+    protected function getMethodAsPublic(string $className, string $methodName): \ReflectionMethod
     {
-        $class = new ReflectionClass($className);
+        $class = new \ReflectionClass($className);
         $method = $class->getMethod($methodName);
         $method->setAccessible(true);
 
