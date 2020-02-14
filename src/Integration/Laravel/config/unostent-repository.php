@@ -12,12 +12,13 @@ return [
     |
     | {root}/{destination}/{placeholder}
     |
-    | The default value is Laravel's helper base_path(),
+    | The default value is Lumen's helper base_path(),
     | which makes the folder structure into:
     |
     | `app/{destination}/{placeholder}`
     |
-    | Note: for Laravel apps just replace the default value to \app_path()
+    | Note:
+    |  - For Laravel apps just replace the default value to \app_path()
     |
     */
     'root' => \base_path() . '/app',
@@ -34,8 +35,6 @@ return [
     | The default value is null, which makes the folder structure into:
     | `{root}/{placeholder}`
     |
-    | Example class implementation:
-    | `\App\Repositories\ExampleRepository::class`
     */
     'destination' => null,
 
@@ -50,6 +49,7 @@ return [
     |
     | The default value is null, which makes the folder structure into:
     | `{root}/{placeholder}/Repositories`
+    |
     */
     'placeholder' => null
 ];
