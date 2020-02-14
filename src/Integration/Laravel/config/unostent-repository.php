@@ -17,8 +17,10 @@ return [
     |
     | `app/{destination}/{placeholder}`
     |
+    | Note: for Laravel apps just replace the default value to \app_path()
+    |
     */
-    'root' => \base_path(),
+    'root' => \base_path() . '/app',
 
     /*
     |--------------------------------------------------------------------------
