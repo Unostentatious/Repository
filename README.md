@@ -1,8 +1,83 @@
 #  Unostentatious Repository
-An abstraction layer that let's you implement repository pattern for your `Eloquent` models.
+An abstraction layer that let's you implement repository pattern for your models.
 
 ### Requirements
 * PHP 7.4^
 * Laravel 6.14^ / Lumen 6.3^
 
-### Usage
+### Installation
+#### Step 1: Install through Composer
+``
+composer require unostentatious/repository
+``
+---
+#### Step 2: Publish the service provider
+##### In Laravel:
+
+In `config\app` add the provider under package service provider section:
+
+````php
+ /*
+  * Package Service Providers...
+  */
+ \Unostentatious\Repository\Integration\Laravel\UnostentatiousRepositoryProvider::class,       
+````
+
+Then open your terminal, while in the laravel app's root directory, publish the vendor:
+````php
+php artisan vendor:publish --provider="Unostentatious\Repository\Integration\Laravel\UnostentatiousRepositoryProvider"
+````
+---
+##### In Lumen:
+
+Go to `bootstrap/app.php` then register the service provider and add the package's config explicitly like so:
+````php
+// Other actions...
+
+$app->register(\Unostentatious\Repository\Integration\Laravel\UnostentatiousRepositoryProvider::class);
+$app->configure('unostent-repository');
+`````
+
+---
+#### Step 3: Custom Configurations
+Right now the package's configuration is already residing to your app's config directory `/config`,
+there are 3 values in the package's config that you can customize to fit your needs:
+````php
+<?php
+declare(strict_types=1);
+
+return [
+    'root' => null,
+    'destination' => null,
+    'placeholder' => null
+];
+````
+| Key                                    | Value                                                              
+| -------------------------------------- | ---------------------------------------------------------------------
+| **root**                               | The base directory in which the application is assigned the folder,
+|                                        | and the structure of the repositories where will be based on.
+|                                        |     sample value:                        
+|                                        |        - Laravel: \app_path()
+|                                        |        - Lumen: \base_path() . '/app'  
+|                                        |
+| **destination**                        | Define the repositories destination within the `{root}` directory.
+|                                        |     sample value:
+|                                        |        - 'Database'
+|                                        |
+|                                        | When a value is given ie `Database` the default path will be:
+|                                        | `{root}/Database/{placeholder}
+|                                        |
+| **placeholder**                        | Define the repositories placeholder within the `{root}/{destination}`,
+|                                        |      sample value:
+|                                        |         - Repo 
+|                                        | when a value is given ie `Repo` the default path will be:
+|                                        |`{root}/{destination}/Repo`.
+|                                        |
+|                                        | The default value is null, which makes the folder structure into:
+|                                        | `{root}/{placeholder}/Repositories`
+
+
+#### Installation Done:
+Viola! Just like that your ready to use `Unostentatious Repository` in your Laravel or Lumen application, happy coding!
+
+#### See Usage Documentation (TBA):
