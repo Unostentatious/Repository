@@ -10,7 +10,10 @@ use Mockery\MockInterface;
 use Unostentatious\Repository\Tests\Stubs\ModelStub;
 use Unostentatious\Repository\Tests\Stubs\RepositoryStub;
 
-final class AbstractUnostentatiousRepositoryTest extends AbstractTestCase
+/**
+ * @covers \Unostentatious\Repository\AbstractEloquentRepository
+ */
+final class AbstractEloquentRepositoryTest extends AbstractTestCase
 {
     /**
      * Assert that the repository's all() method returns an array type.

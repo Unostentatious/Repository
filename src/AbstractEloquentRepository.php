@@ -6,13 +6,13 @@ namespace Unostentatious\Repository;
 use Illuminate\Database\Eloquent\Model;
 use Unostentatious\Repository\Interfaces\ConnectionRepositoryInterface;
 
-abstract class AbstractUnostentatiousRepository implements ConnectionRepositoryInterface
+abstract class AbstractEloquentRepository implements ConnectionRepositoryInterface
 {
     /** @var \Illuminate\Database\Eloquent\Model $model */
     protected Model $model;
 
     /**
-     * AbstractUnostentatiousRepository constructor.
+     * AbstractEloquentRepository constructor.
      *
      * @throws \ReflectionException
      *
@@ -163,6 +163,8 @@ abstract class AbstractUnostentatiousRepository implements ConnectionRepositoryI
      * Set the selected model.
      *
      * @param \Illuminate\Database\Eloquent\Model $model
+     *
+     * @return void
      */
     private function setModel(Model $model): void
     {

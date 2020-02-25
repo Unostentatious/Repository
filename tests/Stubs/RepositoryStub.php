@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Unostentatious\Repository\Tests\Stubs;
 
-use Unostentatious\Repository\AbstractUnostentatiousRepository;
+use Unostentatious\Repository\AbstractEloquentRepository;
 
-class RepositoryStub extends AbstractUnostentatiousRepository
+class RepositoryStub extends AbstractEloquentRepository
 {
 
     /**

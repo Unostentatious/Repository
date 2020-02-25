@@ -5,6 +5,9 @@ namespace Unostentatious\Repository\Tests;
 
 use Laravel\Lumen\Application;
 
+/**
+ * @covers nothing
+ */
 abstract class AbstractApplicationTestCase extends AbstractTestCase
 {
     /**

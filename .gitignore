@@ -3,3 +3,4 @@ vendor
 docker.sh
 .phpunit.result.cache
 .idea
+/phpunit.xml.dist

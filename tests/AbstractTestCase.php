@@ -7,6 +7,9 @@ use Mockery;
 use Mockery\LegacyMockInterface;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @covers nothing
+ */
 abstract class AbstractTestCase extends TestCase
 {
     /**
