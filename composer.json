@@ -1,6 +1,6 @@
 {
   "name": "unostentatious/repository",
-  "description": "Package of Abstraction layer implementing repository pattern for Eloquent models.",
+  "description": "An abstraction layer that let's you implement repository pattern for your models.",
   "type": "library",
   "license": "MIT",
   "keywords": [
