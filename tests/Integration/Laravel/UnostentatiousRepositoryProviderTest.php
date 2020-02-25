@@ -10,6 +10,9 @@ use Unostentatious\Repository\Tests\AbstractApplicationTestCase;
 use Unostentatious\Repository\Tests\Integration\Laravel\Stubs\Classes\Interfaces\RepositoryStubInterface;
 use Unostentatious\Repository\Tests\Integration\Laravel\Stubs\Classes\RepositoryStub;
 
+/**
+ * @covers \Unostentatious\Repository\Integration\Laravel\UnostentatiousRepositoryProvider
+ */
 final class UnostentatiousRepositoryProviderTest extends AbstractApplicationTestCase
 {
     /**
