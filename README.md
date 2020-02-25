@@ -7,14 +7,15 @@ An abstraction layer that let's you implement repository pattern for your models
 
 ### Installation
 #### Step 1: Install through Composer
-``
+
+````shell script
 composer require unostentatious/repository
-``
+````
 ---
 #### Step 2: Publish the service provider
 ##### In Laravel:
 
-In `config\app` add the provider under package service provider section:
+In `Laravel`, edit `config\app.php` and add the provider under package service provider section:
 
 ````php
  /*
@@ -23,14 +24,16 @@ In `config\app` add the provider under package service provider section:
  \Unostentatious\Repository\Integration\Laravel\UnostentatiousRepositoryProvider::class,       
 ````
 
-Then open your terminal, while in the laravel app's root directory, publish the vendor:
+Then open your terminal, while in the `Laravel` app's root directory, publish the vendor:
+
 ````php
 php artisan vendor:publish --provider="Unostentatious\Repository\Integration\Laravel\UnostentatiousRepositoryProvider"
 ````
 ---
 ##### In Lumen:
 
-Go to `bootstrap/app.php` then register the service provider and add the package's config explicitly like so:
+In `Lumen`, edit `bootstrap/app.php` then register the service provider and add the package's config explicitly like so:
+
 ````php
 // Other actions...
 
@@ -42,6 +45,7 @@ $app->configure('unostent-repository');
 #### Step 3: Custom Configurations
 Right now the package's configuration is already residing to your app's config directory `/config`,
 there are 3 values in the package's config that you can customize to fit your needs:
+
 ````php
 <?php
 declare(strict_types=1);
@@ -52,6 +56,7 @@ return [
     'placeholder' => null
 ];
 ````
+
 | Key                                    | Value                                                              
 | -------------------------------------- | ---------------------------------------------------------------------
 | **root**                               | The base directory in which the application is assigned the folder,
