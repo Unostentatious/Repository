@@ -1,9 +1,9 @@
-<div style="text-align:center">
+<div align="center">
  <img alt="Unostentatious Repository" src="https://repository-images.githubusercontent.com/240037373/291a4280-4e92-11ea-817d-dd947c29c107" width="300px" height="150px" />
 </div>
 
 
-<div style="text-align:center">
+<div align="center">
  
 [![Latest Stable Version](https://poser.pugx.org/unostentatious/repository/v/stable?format=flat-square)](https://packagist.org/packages/unostentatious/repository)
 [![Total Downloads](https://poser.pugx.org/unostentatious/repository/downloads?format=flat-square)](https://packagist.org/packages/unostentatious/repository)
