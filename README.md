@@ -1,6 +1,9 @@
 #  Unostentatious Repository
 An abstraction layer that let's you implement repository pattern for your models.
 
+[![Latest Stable Version](https://poser.pugx.org/unostentatious/repository/v/stable?format=flat-square)](https://packagist.org/packages/unostentatious/repository)
+[![Total Downloads](https://poser.pugx.org/unostentatious/repository/downloads?format=flat-square)](https://packagist.org/packages/unostentatious/repository)
+[![License](https://poser.pugx.org/unostentatious/repository/license?format=flat-square)](https://packagist.org/packages/unostentatious/repository)
 ### Requirements
 * PHP 7.4^
 * Laravel 6.14^ / Lumen 6.3^
