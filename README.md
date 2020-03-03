@@ -9,14 +9,14 @@
 [![Total Downloads](https://poser.pugx.org/unostentatious/repository/downloads?format=flat-square)](https://packagist.org/packages/unostentatious/repository)
 [![License](https://poser.pugx.org/unostentatious/repository/license?format=flat-square)](https://packagist.org/packages/unostentatious/repository)
 
-</div>
+
 
 <br />
 
 # Unostentatious Repository
 An abstraction layer that let's you implement repository pattern for your models.
 
-
+</div>
 
 ### Requirements
 * PHP 7.4^
