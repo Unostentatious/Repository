@@ -17,6 +17,7 @@
 An abstraction layer that let's you implement repository pattern for your models.
 
 </div>
+<br />
 
 ### Requirements
 * PHP 7.4^
