@@ -28,10 +28,10 @@ final class AbstractEloquentRepositoryTest extends AbstractTestCase
         $model = $this->mock(ModelStub::class, function (MockInterface $model): void {
             /** @var \Illuminate\Database\Eloquent\Collection $collection */
             $collection = $this->mock(Collection::class, function (MockInterface $collection): void {
-                $collection->shouldReceive('getDictionary')->once()->withNoArgs()->andReturn([]);
+                $collection->shouldReceive('getDictionary')->twice()->withNoArgs()->andReturn([]);
             });
 
-            $model->shouldReceive('all')->once()->withNoArgs()->andReturn($collection);
+            $model->shouldReceive('all')->twice()->withNoArgs()->andReturn($collection);
         });
 
         $repository = $this->createRepository($model);
@@ -175,7 +175,7 @@ final class AbstractEloquentRepositoryTest extends AbstractTestCase
     {
         /** @var \Illuminate\Database\Eloquent\Model $model */
         $model = $this->mock(Model::class, function (MockInterface $model): void {
-            $model->shouldReceive('save')->once()->withNoArgs()->andReturnFalse();
+            $model->shouldReceive('save')->twice()->withNoArgs()->andReturnFalse();
         });
 
         $repository = $this->createRepository($model);
@@ -195,7 +195,7 @@ final class AbstractEloquentRepositoryTest extends AbstractTestCase
     {
         /** @var \Illuminate\Database\Eloquent\Model $model */
         $model = $this->mock(Model::class, function (MockInterface $model): void {
-            $model->shouldReceive('save')->once()->withNoArgs()->andReturnTrue();
+            $model->shouldReceive('save')->twice()->withNoArgs()->andReturnTrue();
         });
 
         $repository = $this->createRepository($model);
@@ -215,22 +215,53 @@ final class AbstractEloquentRepositoryTest extends AbstractTestCase
     {
         /** @var \Illuminate\Database\Eloquent\Model $model */
         $model = $this->mock(Model::class, function (MockInterface $model): void {
-            $model->shouldReceive('save')->once()->withNoArgs()->andReturnTrue();
+            /** @var \Illuminate\Database\Connection $connection */
+            $connection = $this->mock(Connection::class, function (MockInterface $connection): void {
+                $connection->shouldReceive('beginTransaction')->once()->withNoArgs()->andReturnNull();
+                $connection->shouldReceive('commit')->once()->withNoArgs()->andReturnNull();
+            });
+
+            $model->shouldReceive('getConnection')->twice()->withNoArgs()->andReturn($connection);
         });
 
-        $transaction = function () use ($model): bool {
-            return $model->save();
+        $repository = $this->createRepository($model);
+
+        $closure = function (): bool {
+            return true;
         };
 
-        $repositoryMock = function (MockInterface $repository) use ($transaction): void {
-            $repository->shouldReceive('transact')->once()->withArgs($transaction);
-            $repository->shouldReceive('beginTransaction')->once()->withNoArgs()->andReturnNull();
-            $repository->shouldReceive('commit')->once()->withNoArgs()->andReturnNull();
+        self::assertTrue($repository->transact($closure));
+    }
+
+    /**
+     * Assert that the transact() method executes beginTransaction() and commit() method upon success.
+     *
+     * @return void
+     *
+     * @throws \Throwable
+     */
+    public function testTransactThrowException(): void
+    {
+        $this->expectException(\Exception::class);
+
+        /** @var \Illuminate\Database\Eloquent\Model $model */
+        $model = $this->mock(Model::class, function (MockInterface $model): void {
+            /** @var \Illuminate\Database\Connection $connection */
+            $connection = $this->mock(Connection::class, function (MockInterface $connection): void {
+                $connection->shouldReceive('beginTransaction')->once()->withNoArgs()->andReturnNull();
+                $connection->shouldNotReceive('commit');
+            });
+
+            $model->shouldReceive('getConnection')->twice()->withNoArgs()->andReturn($connection);
+        });
+
+        $repository = $this->createRepository($model);
+
+        $closure = function (): bool {
+            throw new \Exception('Exception test');
         };
 
-        $repository = $this->createRepository($model, $repositoryMock);
-
-        self::assertNull($repository->transact($transaction));
+        self::assertTrue($repository->transact($closure));
     }
 
     /**
@@ -245,13 +276,18 @@ final class AbstractEloquentRepositoryTest extends AbstractTestCase
      */
     private function createRepository(Model $model, ?callable $expectation = null): RepositoryStub
     {
-        $repository = new RepositoryStub();
+        $repository = new \stdClass();
+
+        if (isset($expectation) === false) {
+            $repository = new RepositoryStub();
+        }
 
         if (isset($expectation) === true) {
             $repository = $this->mock(RepositoryStub::class, $expectation);
         }
 
-        $this->getMethodAsPublic(RepositoryStub::class, 'setModel')->invoke($repository, $model);
+        $this->getMethodAsPublic(RepositoryStub::class, 'setModel')
+            ->invoke($repository, $model);
 
         return $repository;
     }

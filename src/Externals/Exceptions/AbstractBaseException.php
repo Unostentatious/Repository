@@ -29,14 +29,16 @@ abstract class AbstractBaseException extends Exception implements BaseExceptionI
         ?Throwable $previous = null
     ) {
         parent::__construct($message ?? '', $code ?? 0, $previous);
-        
+
         $this->messageParams = $messageParameters ?? [];
     }
 
     /**
-     * @inheritdoc
+     * Return the resolved message parameters.
+     *
+     * @return mixed[]
      */
-    public function getMessageParameters(): array
+    final public function getMessageParameters(): array
     {
         return $this->messageParams;
     }

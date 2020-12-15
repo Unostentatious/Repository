@@ -3,15 +3,28 @@ declare(strict_types=1);
 
 namespace Unostentatious\Repository\Tests;
 
+use Laravel\Lumen\Application;
+use Laravel\Lumen\Testing\TestCase;
 use Mockery;
 use Mockery\LegacyMockInterface;
-use PHPUnit\Framework\TestCase;
 
 /**
  * @covers nothing
  */
 abstract class AbstractTestCase extends TestCase
 {
+    /**
+     * @inheritDoc
+     */
+    public function createApplication()
+    {
+        if (isset($this->app) === true) {
+            return $this->app;
+        }
+
+        return $this->app = new Application(__DIR__);
+    }
+
     /**
      * Make protected and private method accessible.
      *

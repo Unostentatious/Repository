@@ -4,16 +4,33 @@ declare(strict_types=1);
 namespace Unostentatious\Repository\Integration\Laravel;
 
 use Illuminate\Support\ServiceProvider;
+use Psr\Log\LoggerInterface;
 use Unostentatious\Repository\Integration\Laravel\Exceptions\IncorrectClassStructureException;
 
 final class UnostentatiousRepositoryProvider extends ServiceProvider
 {
+    private LoggerInterface $logger;
+
     /**
      * Default directory name of repositories placeholder.
      *
      * @var string
      */
     private string $repositoryDir = 'Repositories';
+
+    /**
+     * UnostentatiousRepositoryProvider constructor.
+     *
+     * @param \Illuminate\Contracts\Foundation\Application $app
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     */
+    public function __construct($app)
+    {
+        parent::__construct($app);
+
+        $this->logger = $app->make(LoggerInterface::class);
+    }
 
     /**
      * Create the configuration file on boot.
@@ -130,18 +147,42 @@ final class UnostentatiousRepositoryProvider extends ServiceProvider
         $interfaceDirectory = \sprintf('%s/%s', $repositoryDirectory, 'Interfaces');
 
         try {
-            // If this prompt's and exception, it means the directory is not yet created,
+            // Check first if the specified directories are existing,
+            // if they are not create them.
+            if ($this->createDirectory($repositoryDirectory) === true) {
+                \opendir($repositoryDirectory);
+            }
+
+            if ($this->createDirectory($interfaceDirectory) === true) {
+                \opendir($interfaceDirectory);
+            }
+        } catch (\ErrorException $error) {
+            // If this prompt's an exception, it means the directory is not yet created,
             // this suggests that the directory and config hasn't been established yet,
             // so in that sense, instead of throwing an exception,
             // just return null to notify the provider that there is no action needed to be done.
+            $this->logger->error($error->getMessage());
 
-            \opendir($repositoryDirectory);
-            \opendir($interfaceDirectory);
-        } catch (\ErrorException $error) {
             return null;
         }
 
         return $repositoryDirectory;
+    }
+
+    /**
+     * Check if the specified path is an existing dir or not.
+     *
+     * @param string $path
+     *
+     * @return bool
+     */
+    private function createDirectory(string $path): bool
+    {
+        if (\is_dir($path) === true) {
+            return true;
+        }
+
+        return \mkdir($path, 0755);
     }
 
     /**

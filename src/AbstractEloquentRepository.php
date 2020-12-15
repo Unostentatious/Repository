@@ -134,8 +134,6 @@ abstract class AbstractEloquentRepository implements ConnectionRepositoryInterfa
      */
     public function transact(\Closure $func)
     {
-
-
         $this->beginTransaction();
 
         try {
