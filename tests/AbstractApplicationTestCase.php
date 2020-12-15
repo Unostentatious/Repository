@@ -10,12 +10,6 @@ use Laravel\Lumen\Application;
  */
 abstract class AbstractApplicationTestCase extends AbstractTestCase
 {
-    /**
-     * The application instance.
-     *
-     * @var \Laravel\Lumen\Application
-     */
-    private Application $app;
 
     /**
      * Assert that the given abstract is an instance within the application container.
@@ -37,10 +31,6 @@ abstract class AbstractApplicationTestCase extends AbstractTestCase
      */
     protected function getApplication(): Application
     {
-        if (isset($this->app) === true) {
-            return $this->app;
-        }
-
-        return $this->app = new Application(__DIR__);
+        return $this->createApplication();
     }
 }
