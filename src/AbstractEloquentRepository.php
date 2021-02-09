@@ -24,9 +24,7 @@ abstract class AbstractEloquentRepository implements ConnectionRepositoryInterfa
     }
 
     /**
-     * Return a list of objects from the repository.
-     *
-     * @return object[]
+     * @inheritDoc
      */
     public function all(): array
     {
@@ -34,11 +32,9 @@ abstract class AbstractEloquentRepository implements ConnectionRepositoryInterfa
     }
 
     /**
-     * Start a new database transaction.
+     * @inheritDoc
      *
-     * @return void
-     *
-     * @throws \Exception
+     * @throws \Exception|\Throwable
      */
     public function beginTransaction(): void
     {
@@ -46,9 +42,9 @@ abstract class AbstractEloquentRepository implements ConnectionRepositoryInterfa
     }
 
     /**
-     * Commit the active database transaction.
+     * @inheritDoc
      *
-     * @return void
+     * @throws \Throwable
      */
     public function commit(): void
     {
@@ -56,11 +52,7 @@ abstract class AbstractEloquentRepository implements ConnectionRepositoryInterfa
     }
 
     /**
-     * Delete given object(s).
-     *
-     * @param Model|Model[] $object
-     *
-     * @return void
+     * @inheritDoc
      *
      * @throws \Exception
      */
@@ -76,11 +68,7 @@ abstract class AbstractEloquentRepository implements ConnectionRepositoryInterfa
     }
 
     /**
-     * Find object for given identifier, return null if not found.
-     *
-     * @param int|string $identifier
-     *
-     * @return null|Model
+     * @inheritDoc
      *
      * @noinspection PhpUndefinedMethodInspection
      */
@@ -90,11 +78,9 @@ abstract class AbstractEloquentRepository implements ConnectionRepositoryInterfa
     }
 
     /**
-     * Rollback the active database transaction.
+     * @inheritDoc
      *
-     * @return void
-     *
-     * @throws \Exception
+     * @throws \Exception|\Throwable
      */
     public function rollback(): void
     {
@@ -102,35 +88,35 @@ abstract class AbstractEloquentRepository implements ConnectionRepositoryInterfa
     }
 
     /**
-     * Save given object(s).
-     *
-     * @param Model|Model[] $object The object or list of objects to save
-     *
-     * @return bool
+     * @inheritDoc
      */
-    public function save($object): bool
-    {
+    public function save(
+        $object,
+        ?array $upsertValues = null,
+        ?array $uniqueBy = null,
+        ?array $fieldToUpdate = null
+    ) {
         if (\is_array($object) === false) {
             $object = [$object];
         }
 
+        /** @var \Illuminate\Database\Eloquent\Model $obj */
         foreach ($object as $obj) {
-            if ($obj->save() === false) {
-                return false;
+            if ($upsertValues !== null && $uniqueBy !== null) {
+                /** @var \Illuminate\Database\Eloquent\Builder $builder */
+                $builder = $obj->newModelQuery();
+
+                return $builder->upsert($upsertValues, $uniqueBy, $fieldToUpdate);
             }
+
+            return $obj->save();
         }
 
-        return true;
+        return false;
     }
 
     /**
-     * Init transaction for procedures that requires commit or rollback during exception.
-     *
-     * @param \Closure $func
-     *
-     * @return bool|mixed
-     *
-     * @throws \Throwable
+     * @inheritDoc
      */
     public function transact(\Closure $func)
     {
@@ -140,7 +126,6 @@ abstract class AbstractEloquentRepository implements ConnectionRepositoryInterfa
             $return = \call_user_func($func);
 
             $this->commit();
-
 
             return $return ?? true;
         } catch (\Throwable $exception) {

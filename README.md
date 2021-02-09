@@ -21,7 +21,7 @@ An abstraction layer that let's you implement repository pattern for your models
 
 ### Requirements
 * PHP 7.4^
-* Laravel 6.14^ / Lumen 6.3^
+* Laravel 8.x / Lumen 8.x
 
 ### Installation
 #### Step 1: Install through Composer

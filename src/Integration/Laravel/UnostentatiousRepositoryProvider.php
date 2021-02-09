@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Unostentatious\Repository\Integration\Laravel;
 
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 use Psr\Log\LoggerInterface;
 use Unostentatious\Repository\Integration\Laravel\Exceptions\IncorrectClassStructureException;
@@ -24,6 +25,8 @@ final class UnostentatiousRepositoryProvider extends ServiceProvider
      * @param \Illuminate\Contracts\Foundation\Application $app
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     *
+     * @noinspection PhpMissingParamTypeInspection
      */
     public function __construct($app)
     {

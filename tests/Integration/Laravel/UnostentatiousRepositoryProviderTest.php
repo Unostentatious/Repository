@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Unostentatious\Repository\Tests\Integration\Laravel;
 
 use Illuminate\Container\EntryNotFoundException;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
 use Mockery\MockInterface;
 use Psr\Log\LoggerInterface;
@@ -12,6 +13,7 @@ use Unostentatious\Repository\Integration\Laravel\UnostentatiousRepositoryProvid
 use Unostentatious\Repository\Tests\AbstractApplicationTestCase;
 use Unostentatious\Repository\Tests\Integration\Laravel\Stubs\Classes\Interfaces\RepositoryStubInterface;
 use Unostentatious\Repository\Tests\Integration\Laravel\Stubs\Classes\RepositoryStub;
+use voku\helper\ASCII;
 
 /**
  * @covers \Unostentatious\Repository\Integration\Laravel\UnostentatiousRepositoryProvider
@@ -73,15 +75,32 @@ final class UnostentatiousRepositoryProviderTest extends AbstractApplicationTest
             }
         );
 
+        /** @var \Illuminate\Contracts\Container\Container $config */
+        $config = $this->mock(
+            Container::class,
+            function (MockInterface $container): void {
+                $container
+                    ->shouldReceive('set')
+                    ->once()
+                    ->withAnyArgs();
+
+                $container
+                    ->shouldReceive('get')
+                    ->once()
+                    ->withAnyArgs()
+                    ->andReturn([]);
+            }
+        );
+
         /** @var \Illuminate\Contracts\Foundation\Application $app */
         $app = $this->mock(
             Application::class,
-            function (MockInterface $application) use ($logger): void {
+            function (MockInterface $application) use ($config, $logger): void {
                 $application
-                    ->shouldReceive('configurationIsCached')
+                    ->shouldReceive('make')
+                    ->with('config')
                     ->once()
-                    ->withNoArgs()
-                    ->andReturnTrue();
+                    ->andReturn($config);
 
                 $application
                     ->shouldReceive('make')
