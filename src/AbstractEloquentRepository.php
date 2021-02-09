@@ -117,6 +117,8 @@ abstract class AbstractEloquentRepository implements ConnectionRepositoryInterfa
 
     /**
      * @inheritDoc
+     *
+     * @noinspection PhpMissingReturnTypeInspection
      */
     public function transact(\Closure $func)
     {

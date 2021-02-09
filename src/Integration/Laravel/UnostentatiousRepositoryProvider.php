@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Unostentatious\Repository\Integration\Laravel;
 
-use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 use Psr\Log\LoggerInterface;
 use Unostentatious\Repository\Integration\Laravel\Exceptions\IncorrectClassStructureException;
