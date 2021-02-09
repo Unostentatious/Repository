@@ -33,7 +33,7 @@ composer require unostentatious/repository
 #### Step 2: Publish the service provider
 ##### In Laravel:
 
-In `Laravel`, edit `config\app.php` and add the provider under package service provider section:
+1. In `Laravel`, edit `config\app.php` and add the provider under package service provider section:
 
 ````php
  /*
@@ -42,7 +42,7 @@ In `Laravel`, edit `config\app.php` and add the provider under package service p
  \Unostentatious\Repository\Integration\Laravel\UnostentatiousRepositoryProvider::class,       
 ````
 
-Then open your terminal, while in the `Laravel` app's root directory, publish the vendor:
+2. Then open your terminal, while in the `Laravel` app's root directory, publish the vendor:
 
 ````php
 php artisan vendor:publish --provider="Unostentatious\Repository\Integration\Laravel\UnostentatiousRepositoryProvider"
@@ -50,7 +50,9 @@ php artisan vendor:publish --provider="Unostentatious\Repository\Integration\Lar
 ---
 ##### In Lumen:
 
-In `Lumen`, edit `bootstrap/app.php` then register the service provider and add the package's config explicitly like so:
+1. Copy the `unostent-repository.php` config file from `vendor/unostentatious/repository/Integration/config/` directory
+2. If the `{root}/config/` directory is not existing in your Lumen app, make sure to create it first, paste the config file you just copied
+3. Edit `bootstrap/app.php` then register the service provider and add the package's config explicitly like so:
 
 ````php
 // Other actions...
