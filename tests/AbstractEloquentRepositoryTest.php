@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Unostentatious\Repository\Tests;
 
 use Illuminate\Database\Connection;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Mockery\MockInterface;
@@ -46,7 +47,7 @@ final class AbstractEloquentRepositoryTest extends AbstractTestCase
      * @return void
      *
      * @throws \ReflectionException
-     * @throws \Exception
+     * @throws \Exception|\Throwable
      *
      * @noinspection PhpVoidFunctionResultUsedInspection
      */
@@ -73,7 +74,7 @@ final class AbstractEloquentRepositoryTest extends AbstractTestCase
      * @return void
      *
      * @throws \ReflectionException
-     * @throws \Exception
+     * @throws \Exception|\Throwable
      *
      * @noinspection PhpVoidFunctionResultUsedInspection
      */
@@ -143,7 +144,7 @@ final class AbstractEloquentRepositoryTest extends AbstractTestCase
      * @return void
      *
      * @throws \ReflectionException
-     * @throws \Exception
+     * @throws \Exception|\Throwable
      *
      * @noinspection PhpVoidFunctionResultUsedInspection
      */
@@ -202,6 +203,43 @@ final class AbstractEloquentRepositoryTest extends AbstractTestCase
 
         self::assertIsBool($repository->save($model));
         self::assertEquals(true, $repository->save($model));
+    }
+
+    /**
+     * Assert that the save() method executes upsert transaction,
+     * and returns the number of affected rows upon success.
+     *
+     * @return void
+     *
+     * @throws \ReflectionException
+     */
+    public function testSaveModelUpsertSuccess(): void
+    {
+        /** @var \Illuminate\Database\Eloquent\Builder $builder */
+        $builder = $this->mock(Builder::class, function (MockInterface $builder): void {
+            $builder
+                ->shouldReceive('upsert')
+                ->once()
+                ->withArgs(
+                    function ($upsertValues, $uniqueBy, $fieldToUpdate): bool {
+                        return \is_array($upsertValues) && \is_array($uniqueBy) && \is_null($fieldToUpdate);
+                    }
+                )
+                ->andReturn(0);
+        });
+
+        /** @var \Illuminate\Database\Eloquent\Model $model */
+        $model = $this->mock(Model::class, function (MockInterface $model) use ($builder): void {
+            $model->shouldNotReceive('save');
+
+            $model->shouldReceive('newModelQuery')
+                ->once()
+                ->andReturn($builder);
+        });
+
+        $repository = $this->createRepository($model);
+
+        self::assertEquals(0, $repository->save($model, [], []));
     }
 
     /**

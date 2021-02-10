@@ -35,11 +35,21 @@ interface ModelRepositoryInterface
     public function find($identifier): ?Model;
 
     /**
-     * Save given object(s).
+     * Save given object(s) and return true, if upsert values are present,
+     * this will indicate that the upsert transaction should be implemented,
+     * then return the number of affected rows.
      *
-     * @param Model|Model[] $object The object or list of objects to save
+     * @param Model|Model[] $object The object or list of objects to save.
+     * @param null|mixed[] $upsertValues the upsert values that will indicate upsert transaction needs to happen.
+     * @param null|string[] $uniqueBy
+     * @param null|string[] $fieldToUpdate
      *
-     * @return bool
+     * @return bool|int
      */
-    public function save($object): bool;
+    public function save(
+        $object,
+        ?array $upsertValues = null,
+        ?array $uniqueBy = null,
+        ?array $fieldToUpdate = null
+    );
 }

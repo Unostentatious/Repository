@@ -24,6 +24,8 @@ final class UnostentatiousRepositoryProvider extends ServiceProvider
      * @param \Illuminate\Contracts\Foundation\Application $app
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     *
+     * @noinspection PhpMissingParamTypeInspection
      */
     public function __construct($app)
     {

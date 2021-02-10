@@ -21,7 +21,7 @@ An abstraction layer that let's you implement repository pattern for your models
 
 ### Requirements
 * PHP 7.4^
-* Laravel 6.14^ / Lumen 6.3^
+* Laravel 8.x / Lumen 8.x
 
 ### Installation
 #### Step 1: Install through Composer
@@ -33,7 +33,7 @@ composer require unostentatious/repository
 #### Step 2: Publish the service provider
 ##### In Laravel:
 
-In `Laravel`, edit `config\app.php` and add the provider under package service provider section:
+1. In `Laravel`, edit `config\app.php` and add the provider under package service provider section:
 
 ````php
  /*
@@ -42,7 +42,7 @@ In `Laravel`, edit `config\app.php` and add the provider under package service p
  \Unostentatious\Repository\Integration\Laravel\UnostentatiousRepositoryProvider::class,       
 ````
 
-Then open your terminal, while in the `Laravel` app's root directory, publish the vendor:
+2. Then open your terminal, while in the `Laravel` app's root directory, publish the vendor:
 
 ````php
 php artisan vendor:publish --provider="Unostentatious\Repository\Integration\Laravel\UnostentatiousRepositoryProvider"
@@ -50,7 +50,9 @@ php artisan vendor:publish --provider="Unostentatious\Repository\Integration\Lar
 ---
 ##### In Lumen:
 
-In `Lumen`, edit `bootstrap/app.php` then register the service provider and add the package's config explicitly like so:
+1. Copy the `unostent-repository.php` config file from `vendor/unostentatious/repository/Integration/config/` directory
+2. If the `{root}/config/` directory is not existing in your Lumen app, make sure to create it first, paste the config file you just copied
+3. Edit `bootstrap/app.php` then register the service provider and add the package's config explicitly like so:
 
 ````php
 // Other actions...
@@ -97,10 +99,39 @@ return [
 |                                        |`{root}/{destination}/Repo`.
 |                                        |
 |                                        | The default value is null, which makes the folder structure into:
-|                                        | `{root}/{placeholder}/Repositories`
+|                                        | `{root}/{destination}/Repositories`
 
 
 #### Installation Done:
 Viola! Just like that your ready to use `Unostentatious Repository` in your Laravel or Lumen application, happy coding!
 
-#### See Usage Documentation (TBA):
+-----------------------------
+
+#### Usage:
+When creating the repository classes it **MUST** reside on the specified path `{root}/{destination}/{placeholder}`, 
+where in this case the default path will be `app/Database/Repositories`:
+
+#### Step 1: Create the Repositories
+It must be composed of a **concrete** class, and it's corresponding **interface**.
+
+#### Step 2: Follow the convention
+Then the concrete class **MUST** extend the **AbstractEloquentRepository** from the package.
+
+See the example:
+
+```php
+<?php
+
+namespace App\Database\Repositories;
+
+use App\Database\Repositories\Interfaces\UserRepositoryInterface;
+use Unostentatious\Repository\AbstractEloquentRepository;
+
+class UserRepository extends AbstractEloquentRepository implements UserRepositoryInterface
+{
+    // Business logic goes here. 
+}
+```
+
+#### Step 3: Load them to the IoC
+Then after these classes has been written, just execute `composer dump-autoload` to invoke the IoC and these classes will now be injectable to consuming classes ie: `Controllers`.
