@@ -32,7 +32,15 @@ final class UnostentatiousRepositoryProvider extends ServiceProvider
         parent::__construct($app);
 
         $this->logger = $app->make(LoggerInterface::class);
+    }
 
+    /**
+     * Create the configuration file on boot.
+     *
+     * @return void
+     */
+    public function boot(): void
+    {
         $this->publishes([
             __DIR__ . '/config/unostent-repository.php' => \base_path('config/unostent-repository.php')
         ]);
@@ -176,7 +184,11 @@ final class UnostentatiousRepositoryProvider extends ServiceProvider
             return true;
         }
 
-        return \mkdir($path, 0755);
+        $mode = 0777;
+        $result = \mkdir($path, 0755, true);
+        \chmod($path, $mode);
+
+        return $result;
     }
 
     /**

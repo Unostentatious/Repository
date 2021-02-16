@@ -36,7 +36,7 @@ return [
     | `{root}/{placeholder}`
     |
     */
-    'destination' => null,
+    'destination' => 'Database',
 
     /*
     |--------------------------------------------------------------------------
