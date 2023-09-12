@@ -8,7 +8,6 @@ use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Foundation\Application;
 use Mockery\MockInterface;
 use Psr\Log\LoggerInterface;
-use Unostentatious\Repository\Integration\Laravel\Exceptions\IncorrectClassStructureException;
 use Unostentatious\Repository\Integration\Laravel\UnostentatiousRepositoryProvider;
 use Unostentatious\Repository\Tests\AbstractApplicationTestCase;
 use Unostentatious\Repository\Tests\Integration\Laravel\Stubs\Classes\Interfaces\RepositoryStubInterface;
@@ -25,7 +24,6 @@ final class UnostentatiousRepositoryProviderTest extends AbstractApplicationTest
      *
      * @return void
      *
-     * @throws \Unostentatious\Repository\Integration\Laravel\Exceptions\IncorrectClassStructureException
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     public function testEmptyDirectory(): void
@@ -53,8 +51,6 @@ final class UnostentatiousRepositoryProviderTest extends AbstractApplicationTest
      * Assert the result when the directory placeholder is not existing.
      *
      * @return void
-     *
-     * @throws \Unostentatious\Repository\Integration\Laravel\Exceptions\IncorrectClassStructureException
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
