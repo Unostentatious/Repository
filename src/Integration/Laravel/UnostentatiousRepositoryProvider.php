@@ -4,11 +4,16 @@ declare(strict_types=1);
 namespace Unostentatious\Repository\Integration\Laravel;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
 use Psr\Log\LoggerInterface;
-use Unostentatious\Repository\Integration\Laravel\Exceptions\IncorrectClassStructureException;
 
 final class UnostentatiousRepositoryProvider extends ServiceProvider
 {
+    private const INTERFACES = 'Interfaces';
+
+    /**
+     * @var \Psr\Log\LoggerInterface|mixed
+     */
     private LoggerInterface $logger;
 
     /**
@@ -19,19 +24,25 @@ final class UnostentatiousRepositoryProvider extends ServiceProvider
     private string $repositoryDir = 'Repositories';
 
     /**
+     * Application app path.
+     *
+     * @var string
+     */
+    protected string $appPath = '';
+
+    /**
      * UnostentatiousRepositoryProvider constructor.
      *
      * @param \Illuminate\Contracts\Foundation\Application $app
      *
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
-     *
-     * @noinspection PhpMissingParamTypeInspection
      */
     public function __construct($app)
     {
         parent::__construct($app);
 
         $this->logger = $app->make(LoggerInterface::class);
+        $this->appPath = base_path() . '/app';
     }
 
     /**
@@ -50,26 +61,25 @@ final class UnostentatiousRepositoryProvider extends ServiceProvider
      * Register the repositories based on the configuration provided.
      *
      * @return void
-     *
-     * @throws \Unostentatious\Repository\Integration\Laravel\Exceptions\IncorrectClassStructureException
      */
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__ . '/config/unostent-repository.php', 'unostent-repository');
 
-        $directories = $this->buildDirectoryPaths(
-            \config('unostent-repository.root', null),
-            \config('unostent-repository.destination', null),
-            \config('unostent-repository.placeholder', null)
-        );
+        $root = \config('unostent-repository.root', null);
+        $destination = \config('unostent-repository.destination', null);
+        $placeholder = \config('unostent-repository.placeholder', null);
+        $directories = $this->buildDirectoryPaths($root, $destination, $placeholder);
+        $rootNamespace = $this->resolveDefaultNamespace($root, $destination, $placeholder);
 
         if ($directories !== null) {
             foreach ($this->getFiles($directories) as $file) {
-                $tokens = $this->getFileTokens($file);
+                $array = \explode('.php', basename($file));
+                $string = \implode('', $array);
 
-                [$interface, $repository] = $this->getRepoAndInterface($tokens);
+                $repository = \sprintf('%s\%s\%s', $rootNamespace, $this->repositoryDir, $string);
+                $interface = \sprintf('%s\%s\Interfaces\%sInterface', $rootNamespace, $this->repositoryDir, $string);
 
-                // If it is already in the container, skip it.
                 if ($this->app->has($interface) === true) {
                     continue;
                 }
@@ -80,44 +90,35 @@ final class UnostentatiousRepositoryProvider extends ServiceProvider
     }
 
     /**
-     * Return the classes with it's corresponding interfaces.
+     * Return the root namespace provided from config.
      *
-     * @param mixed[] $tokens
+     * @param null|string $root
+     * @param null|string $destination
+     * @param null|string $placeholder
      *
-     * @return mixed[]
+     * @return string
      */
-    protected function getRepoAndInterface(array $tokens): array
-    {
-        $class = $namespace = '';
+    private function resolveDefaultNamespace(
+        ?string $root = null,
+        ?string $destination = null,
+        ?string $placeholder = null
+    ): string {
+        $rootNamespace = null;
 
-        for ($it = 0; \count($tokens) > $it; $it++) {
-            // Check if token index is a namespace.
-            if ($tokens[$it][0] === T_NAMESPACE) {
-                for ($j = $it + 1; $j < count($tokens); $j++) {
-                    if ($tokens[$j][0] === T_STRING) {
-                        $namespace .= '\\' . $tokens[$j][1];
-                    } else {
-                        if ($tokens[$j] === '{' || $tokens[$j] === ';') {
-                            break;
-                        }
-                    }
-                }
-            }
-
-            // Check if token index is a class.
-            if ($tokens[$it][0] === T_CLASS) {
-                for ($j = $it + 1; $j < count($tokens); $j++) {
-                    if ($tokens[$j] === '{') {
-                        $class = $tokens[$it + 2][1];
-                    }
-                }
-            }
+        if ($root === $this->appPath) {
+            $rootNamespace = 'App';
         }
 
-        return [
-            \sprintf('%s\%s\%s%s', ltrim($namespace, "\'"), 'Interfaces', $class, 'Interface'),
-            \sprintf('%s\%s', ltrim($namespace, "\'"), $class)
-        ];
+        if ($root !== $this->appPath) {
+            $rootNamespace = \explode(base_path() . '/', $root);
+            $rootNamespace = implode('', $rootNamespace);
+        }
+
+        return \sprintf('%s%s%s',
+            $rootNamespace,
+            $destination ? \sprintf('\%s', Str::studly($destination)) : null,
+            $placeholder ? \sprintf('\%s', Str::studly($placeholder)) : null
+        );
     }
 
     /**
@@ -146,8 +147,7 @@ final class UnostentatiousRepositoryProvider extends ServiceProvider
                 $this->repositoryDir
             );
         }
-        $interfaceDirectory = \sprintf('%s/%s', $repositoryDirectory, 'Interfaces');
-
+        $interfaceDirectory = \sprintf('%s/%s', $repositoryDirectory, self::INTERFACES);
         try {
             // Check first if the specified directories are existing,
             // if they are not create them.
@@ -184,38 +184,7 @@ final class UnostentatiousRepositoryProvider extends ServiceProvider
             return true;
         }
 
-        $mode = 0777;
-        $result = \mkdir($path, 0755, true);
-        \chmod($path, $mode);
-
-        return $result;
-    }
-
-    /**
-     * Return the file as php tokens.
-     *
-     * @param string $file
-     *
-     * @return mixed[]
-     *
-     * @throws \Unostentatious\Repository\Integration\Laravel\Exceptions\IncorrectClassStructureException
-     */
-    private function getFileTokens(string $file): array
-    {
-        $tokens = [];
-        $resource = \fopen($file, 'r');
-        $buffer = '';
-
-        while (\feof($resource) === false) {
-            $buffer .= \fread($resource, 512);
-            $tokens = \token_get_all($buffer);
-
-            if (\strpos($buffer, '{') === false) {
-                throw new IncorrectClassStructureException('Class is incorrectly structured.');
-            }
-        }
-
-        return $tokens;
+        return \mkdir($path, 0755);
     }
 
     /**

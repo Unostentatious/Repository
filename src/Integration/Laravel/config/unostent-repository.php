@@ -48,7 +48,7 @@ return [
     |`{root}/{destination}/Repo`.
     |
     | The default value is null, which makes the folder structure into:
-    | `{root}/{placeholder}/Repositories`
+    | `{root}/{destination}/Repositories`
     |
     */
     'placeholder' => null
