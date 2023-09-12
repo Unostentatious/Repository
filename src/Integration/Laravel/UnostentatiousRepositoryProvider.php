@@ -111,6 +111,7 @@ final class UnostentatiousRepositoryProvider extends ServiceProvider
 
         if ($root !== $this->appPath) {
             $rootNamespace = \explode(base_path() . '/', $root);
+            $rootNamespace = implode('', $rootNamespace);
         }
 
         return \sprintf('%s%s%s',
@@ -147,7 +148,6 @@ final class UnostentatiousRepositoryProvider extends ServiceProvider
             );
         }
         $interfaceDirectory = \sprintf('%s/%s', $repositoryDirectory, self::INTERFACES);
-
         try {
             // Check first if the specified directories are existing,
             // if they are not create them.
